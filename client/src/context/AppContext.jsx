@@ -5,7 +5,10 @@ import { toast } from "react-toastify";
 export const AppContext = createContext();
 
 export const AppContextProvider = (props) => {
-    const backendUrl = "http://localhost:5000";
+    // Use environment variable or fallback to localhost for development
+    const backendUrl = import.meta.env.PROD 
+        ? "https://project3-seekjobs-portal.onrender.com"  
+        : "http://localhost:5000";
 
     const [searchFilter, setSearchFilter] = useState({
         title: '',
@@ -20,22 +23,27 @@ export const AppContextProvider = (props) => {
     const [userData, setUserData] = useState(null);
     const [userApplications, setUserApplications] = useState([]);
     const [userToken, setUserToken] = useState(localStorage.getItem('userToken'));
+    const [loading, setLoading] = useState(true); // Add loading state
 
-    // Fetch Jobs
+    // Fetch Jobs with error handling and loading state
     const fetchJobs = async () => {
+        setLoading(true);
         try {
             const { data } = await axios.get(`${backendUrl}/api/jobs`);
             if (data.success) {
                 setJobs(data.jobs);
             } else {
-                toast.error(data.message);
+                toast.error(data.message || 'Failed to fetch jobs');
             }
         } catch (error) {
-            toast.error(error.message);
+            console.error('Error fetching jobs:', error);
+            toast.error(error.response?.data?.message || 'Failed to connect to server');
+        } finally {
+            setLoading(false);
         }
     };
 
-    // Fetch Company Data
+    // Fetch Company Data with better error handling
     const fetchCompanyData = async () => {
         if (!companyToken) return;
         try {
@@ -45,18 +53,17 @@ export const AppContextProvider = (props) => {
             if (data.success) {
                 setCompanyData(data.company);
             } else {
-                setCompanyToken(null);
-                localStorage.removeItem('companyToken');
-                toast.error(data.message);
+                handleLogout('company');
+                toast.error(data.message || 'Company authentication failed');
             }
         } catch (error) {
-            setCompanyToken(null);
-            localStorage.removeItem('companyToken');
-            toast.error(error.message);
+            console.error('Error fetching company data:', error);
+            handleLogout('company');
+            toast.error(error.response?.data?.message || 'Failed to fetch company data');
         }
     };
 
-    // Fetch User Data
+    // Fetch User Data with better error handling
     const fetchUserData = async () => {
         if (!userToken) return;
         try {
@@ -66,18 +73,17 @@ export const AppContextProvider = (props) => {
             if (data.success) {
                 setUserData(data.user);
             } else {
-                setUserToken(null);
-                localStorage.removeItem('userToken');
-                toast.error(data.message);
+                handleLogout('user');
+                toast.error(data.message || 'User authentication failed');
             }
         } catch (error) {
-            setUserToken(null);
-            localStorage.removeItem('userToken');
-            toast.error(error.message);
+            console.error('Error fetching user data:', error);
+            handleLogout('user');
+            toast.error(error.response?.data?.message || 'Failed to fetch user data');
         }
     };
 
-    // Fetch User's Applications
+    // Fetch User's Applications with better error handling
     const fetchUserApplications = async () => {
         if (!userToken) return;
         try {
@@ -87,23 +93,41 @@ export const AppContextProvider = (props) => {
             if (data.success) {
                 setUserApplications(data.applications);
             } else {
-                toast.error(data.message);
+                toast.error(data.message || 'Failed to fetch applications');
             }
         } catch (error) {
-            toast.error(error.message);
+            console.error('Error fetching applications:', error);
+            toast.error(error.response?.data?.message || 'Failed to fetch applications');
         }
     };
 
+    // Centralized logout handler
+    const handleLogout = (type) => {
+        if (type === 'user') {
+            setUserToken(null);
+            setUserData(null);
+            setUserApplications([]);
+            localStorage.removeItem('userToken');
+        } else if (type === 'company') {
+            setCompanyToken(null);
+            setCompanyData(null);
+            localStorage.removeItem('companyToken');
+        }
+    };
+
+    // Initial data fetch
     useEffect(() => {
         fetchJobs();
     }, []);
 
+    // Company data fetch
     useEffect(() => {
         if (companyToken) {
             fetchCompanyData();
         }
     }, [companyToken]);
 
+    // User data fetch
     useEffect(() => {
         if (userToken) {
             fetchUserData();
@@ -112,17 +136,29 @@ export const AppContextProvider = (props) => {
     }, [userToken]);
 
     const value = {
-        setSearchFilter, searchFilter,
-        isSearched, setIsSearched,
-        jobs, setJobs,
-        showRecruiterLogin, setShowRecruiterLogin,
-        companyToken, setCompanyToken,
-        companyData, setCompanyData,
+        setSearchFilter,
+        searchFilter,
+        isSearched,
+        setIsSearched,
+        jobs,
+        setJobs,
+        showRecruiterLogin,
+        setShowRecruiterLogin,
+        companyToken,
+        setCompanyToken,
+        companyData,
+        setCompanyData,
         backendUrl,
-        userData, setUserData,
-        userApplications, setUserApplications,
-        fetchUserData, fetchUserApplications,
-        userToken, setUserToken
+        userData,
+        setUserData,
+        userApplications,
+        setUserApplications,
+        fetchUserData,
+        fetchUserApplications,
+        userToken,
+        setUserToken,
+        loading,
+        handleLogout  // Expose logout handler
     };
 
     return (
