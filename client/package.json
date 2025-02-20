@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "rimraf dist",
     "build": "vite build",
+    "postbuild": "echo Build completed",
     "lint": "eslint .",
     "preview": "vite preview"
   },
