@@ -5,7 +5,8 @@ const connectCloudinary = async () => {
         if (!process.env.CLOUDINARY_NAME || 
             !process.env.CLOUDINARY_API_KEY || 
             !process.env.CLOUDINARY_API_SECRET) {
-            throw new Error('Cloudinary credentials missing in environment variables');
+            console.warn('Cloudinary credentials missing. Some features may be limited.');
+            return false;
         }
 
         cloudinary.config({
@@ -15,9 +16,10 @@ const connectCloudinary = async () => {
         });
 
         console.log('Cloudinary configured successfully');
+        return true;
     } catch (error) {
-        console.error(`Cloudinary configuration error: ${error.message}`);
-        process.exit(1);
+        console.warn(`Cloudinary configuration warning: ${error.message}`);
+        return false;
     }
 };
 

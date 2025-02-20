@@ -2,6 +2,9 @@
   "name": "full-stack-app",
   "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "install-client": "cd client && rm -rf node_modules package-lock.json && npm install",
     "install-server": "cd server && rm -rf node_modules package-lock.json && npm install",
@@ -9,8 +12,5 @@
     "start-server": "cd server && node server.js",
     "build": "npm run install-client && npm run install-server && npm run build-client",
     "start": "npm run start-server"
-  },
-  "engines": {
-    "node": ">=18.0.0"
   }
 }
