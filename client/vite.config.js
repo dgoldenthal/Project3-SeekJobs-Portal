@@ -12,8 +12,19 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+    chunkSizeWarningLimit: 1500,
     rollupOptions: {
-      external: ['@rollup/rollup-linux-x64-gnu']
+      output: {
+        manualChunks: {
+          vendor: [
+            'react',
+            'react-dom',
+            'react-router-dom',
+            'react-quill',
+            'axios'
+          ]
+        }
+      }
     }
   }
 })
