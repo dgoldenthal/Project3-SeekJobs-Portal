@@ -8,19 +8,15 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
-    extensions: ['.js', '.jsx']
-  },
-  server: {
-    port: 5173,
-    proxy: {
-      '/api': 'http://localhost:5000'
-    }
+    extensions: ['.js', '.jsx', '.json']
   },
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+    sourcemap: true,
     chunkSizeWarningLimit: 1500,
     rollupOptions: {
+      input: path.resolve(__dirname, 'index.html'),
       output: {
         manualChunks: {
           vendor: [
