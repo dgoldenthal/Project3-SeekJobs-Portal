@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 export const AppContext = createContext();
 
 export const AppContextProvider = (props) => {
-    const backendUrl = "http://localhost:5000"; // Remove dependency on .env
+    const backendUrl = "http://localhost:5000";
 
     const [searchFilter, setSearchFilter] = useState({
         title: '',
@@ -15,11 +15,11 @@ export const AppContextProvider = (props) => {
     const [isSearched, setIsSearched] = useState(false);
     const [jobs, setJobs] = useState([]);
     const [showRecruiterLogin, setShowRecruiterLogin] = useState(false);
-    const [companyToken, setCompanyToken] = useState(null);
+    const [companyToken, setCompanyToken] = useState(localStorage.getItem('companyToken'));
     const [companyData, setCompanyData] = useState(null);
     const [userData, setUserData] = useState(null);
     const [userApplications, setUserApplications] = useState([]);
-    const [userToken, setUserToken] = useState(localStorage.getItem('userToken') || null); // Manual user authentication tracking
+    const [userToken, setUserToken] = useState(localStorage.getItem('userToken'));
 
     // Fetch Jobs
     const fetchJobs = async () => {
@@ -45,9 +45,13 @@ export const AppContextProvider = (props) => {
             if (data.success) {
                 setCompanyData(data.company);
             } else {
+                setCompanyToken(null);
+                localStorage.removeItem('companyToken');
                 toast.error(data.message);
             }
         } catch (error) {
+            setCompanyToken(null);
+            localStorage.removeItem('companyToken');
             toast.error(error.message);
         }
     };
@@ -62,9 +66,13 @@ export const AppContextProvider = (props) => {
             if (data.success) {
                 setUserData(data.user);
             } else {
+                setUserToken(null);
+                localStorage.removeItem('userToken');
                 toast.error(data.message);
             }
         } catch (error) {
+            setUserToken(null);
+            localStorage.removeItem('userToken');
             toast.error(error.message);
         }
     };
@@ -86,13 +94,8 @@ export const AppContextProvider = (props) => {
         }
     };
 
-    // Load stored tokens on startup
     useEffect(() => {
         fetchJobs();
-        const storedCompanyToken = localStorage.getItem('companyToken');
-        if (storedCompanyToken) {
-            setCompanyToken(storedCompanyToken);
-        }
     }, []);
 
     useEffect(() => {

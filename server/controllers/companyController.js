@@ -7,34 +7,37 @@ import JobApplication from "../models/JobApplication.js";
 
 // Register a new company
 export const registerCompany = async (req, res) => {
+    const { name, email, password } = req.body;
+    const imageFile = req.file; // Optional now
 
-    const { name, email, password } = req.body
-
-    const imageFile = req.file;
-
-    if (!name || !email || !password || !imageFile) {
-        return res.json({ success: false, message: "Missing Details" })
+    if (!name || !email || !password) {
+        return res.json({ success: false, message: "Please provide name, email and password" });
     }
 
     try {
-
-        const companyExists = await Company.findOne({ email })
+        const companyExists = await Company.findOne({ email });
 
         if (companyExists) {
-            return res.json({ success: false, message: 'Company already registered' })
+            return res.json({ success: false, message: 'Company already registered' });
         }
 
-        const salt = await bcrypt.genSalt(10)
-        const hashPassword = await bcrypt.hash(password, salt)
+        const salt = await bcrypt.genSalt(10);
+        const hashPassword = await bcrypt.hash(password, salt);
 
-        const imageUpload = await cloudinary.uploader.upload(imageFile.path)
+        let imageUrl = 'https://via.placeholder.com/150'; // Default image URL
+
+        // Only upload to cloudinary if an image was provided
+        if (imageFile) {
+            const imageUpload = await cloudinary.uploader.upload(imageFile.path);
+            imageUrl = imageUpload.secure_url;
+        }
 
         const company = await Company.create({
             name,
             email,
             password: hashPassword,
-            image: imageUpload.secure_url
-        })
+            image: imageUrl
+        });
 
         res.json({
             success: true,
@@ -45,12 +48,12 @@ export const registerCompany = async (req, res) => {
                 image: company.image
             },
             token: generateToken(company._id)
-        })
+        });
 
     } catch (error) {
-        res.json({ success: false, message: error.message })
+        res.json({ success: false, message: error.message });
     }
-}
+};
 
 // Login Company
 export const loginCompany = async (req, res) => {
