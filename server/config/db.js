@@ -1,7 +1,4 @@
 import mongoose from "mongoose";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const connectDB = async () => {
     try {
@@ -11,16 +8,14 @@ const connectDB = async () => {
             throw new Error('MongoDB connection string is missing in environment variables');
         }
 
-        const conn = await mongoose.connect(mongoURI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
-
+        const conn = await mongoose.connect(mongoURI);
         console.log(`MongoDB Connected: ${conn.connection.host}`);
     } catch (error) {
         console.error(`Error: ${error.message}`);
-        process.exit(1);
+        // Don't exit the process for DB errors
+        return false;
     }
+    return true;
 };
 
 export default connectDB;
