@@ -41,7 +41,6 @@ const Applications = () => {
         toast.success(data.message)
         await fetchUserData()
         
-        // If we came from a job application, return to that job
         if (returnToJob) {
           navigate(`/apply-job/${returnToJob}`);
         }
@@ -71,7 +70,18 @@ const Applications = () => {
     <>
       <Navbar />
       <div className='container px-4 min-h-[65vh] 2xl:px-20 mx-auto my-10'>
-        <h2 className='text-xl font-semibold'>Your Resume</h2>
+        {/* Return to Home button */}
+        <div className='flex justify-between items-center mb-6'>
+          <h2 className='text-xl font-semibold'>Your Resume</h2>
+          <button 
+            onClick={() => navigate('/')} 
+            className='flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors'
+          >
+            <img src={assets.back_arrow_icon} alt="back" className='w-4 h-4 invert' />
+            Back to Jobs
+          </button>
+        </div>
+
         <div className='flex gap-2 mb-6 mt-3'>
           {
             isEdit || (userData && userData.resume === "")
@@ -118,14 +128,6 @@ const Applications = () => {
                 >
                   Edit
                 </button>
-                {returnToJob && (
-                  <button 
-                    onClick={() => navigate(`/apply-job/${returnToJob}`)}
-                    className='bg-blue-600 text-white px-4 py-2 rounded-lg'
-                  >
-                    Return to Job
-                  </button>
-                )}
               </div>
           }
         </div>
