@@ -10,7 +10,7 @@ import AddJob from './pages/AddJob'
 import ManageJobs from './pages/ManageJobs'
 import ViewApplications from './pages/ViewApplications'
 // Try importing with direct relative path from App.jsx location
-import UserLogin from './pages/Login'  // Changed name to avoid potential conflicts
+import Login from './pages/Login'  // Changed name to avoid potential conflicts
 import 'quill/dist/quill.snow.css'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -24,7 +24,7 @@ const App = () => {
       <ToastContainer />
       <Routes>
         <Route path='/' element={<Home />} />
-        <Route path='/login' element={<UserLogin />} />  {/* Changed component name */}
+        <Route path='/login' element={<Login />} />  {/* Changed component name */}
         <Route path='/apply-job/:id' element={<ApplyJob />} />
         <Route path='/applications' element={<Applications />} />
         <Route path='/dashboard' element={<Dashboard />}>
