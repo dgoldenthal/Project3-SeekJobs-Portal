@@ -18,6 +18,9 @@ await connectCloudinary();
 app.use(cors());
 app.use(express.json());
 
+// Serves static files in the entire client's dist folder
+app.use(express.static('../client/dist'));
+
 // Routes
 app.get('/', (req, res) => res.send("API Working"));
 app.use('/api/company', companyRoutes);
