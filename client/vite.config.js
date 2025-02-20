@@ -6,8 +6,19 @@ export default defineConfig({
     port: 5173,
     open: true,
     proxy: {
-      '/api': 'http://localhost:5000',  // Redirect API calls to the backend
+      '/api': 'http://localhost:5000',
     },
   },
   plugins: [react()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: false,
+    chunkSizeWarningLimit: 1600,
+  },
 });

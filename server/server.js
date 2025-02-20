@@ -18,8 +18,14 @@ const __dirname = path.dirname(__filename);
 
 // Connect to database
 const initializeServer = async () => {
-    await connectDB();
-    await connectCloudinary();
+    try {
+        await connectDB();
+        await connectCloudinary();
+        console.log('Database and Cloudinary connected successfully');
+    } catch (error) {
+        console.error('Server initialization error:', error);
+        process.exit(1);
+    }
 };
 
 // Initialize server
@@ -29,7 +35,15 @@ initializeServer();
 app.use(cors());
 app.use(express.json());
 
-// Routes
+// Set security headers
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    next();
+});
+
+// API Routes
 app.use('/api/company', companyRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/users', userRoutes);
@@ -43,9 +57,24 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+});
+
 // Port
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+    console.log('UNHANDLED REJECTION! 💥 Shutting down...');
+    console.error(err);
+    server.close(() => {
+        process.exit(1);
+    });
 });
