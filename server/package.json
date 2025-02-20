@@ -6,9 +6,10 @@
   "scripts": {
     "server": "nodemon server.js",
     "seed": "node scripts/seed.js",
-    "start": "cd server && npm run start",
-    "develop": "concurrently \"npm run watch\" \"cd client && npm run dev\"",
-    "render-build":"npm install && npm run build"
+    "start": "node server.js",
+    "install": "npm install && cd client && npm install",
+    "build": "npm install && npm run build",
+    "render-build": "npm install && npm run build"
   },
   "keywords": [],
   "author": "",
