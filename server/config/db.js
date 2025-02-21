@@ -5,11 +5,26 @@ const connectDB = async () => {
         const mongoURI = process.env.MONGODB_URI;
         
         if (!mongoURI) {
-            console.error('MongoDB connection string is missing in environment variables');
+            console.error('MongoDB connection string is missing');
             return false;
         }
 
-        const conn = await mongoose.connect(mongoURI);
+        // Log the URI format (hide credentials)
+        const sanitizedUri = mongoURI.replace(
+            /(mongodb\+srv:\/\/)([^:]+):([^@]+)@/,
+            '$1[username]:[password]@'
+        );
+        console.log('Attempting MongoDB connection with URI format:', sanitizedUri);
+
+        if (!mongoURI.startsWith('mongodb://') && !mongoURI.startsWith('mongodb+srv://')) {
+            throw new Error('Invalid MongoDB URI format');
+        }
+
+        const conn = await mongoose.connect(mongoURI, {
+            retryWrites: true,
+            w: 'majority'
+        });
+
         console.log(`MongoDB Connected: ${conn.connection.host}`);
         return true;
     } catch (error) {
