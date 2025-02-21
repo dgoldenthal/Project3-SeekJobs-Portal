@@ -37,7 +37,10 @@ const initializeServer = async () => {
 };
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+    origin: ['http://localhost:5173', 'https://project3-seekjobs-portal.onrender.com'],
+    credentials: true
+}));
 app.use(express.json());
 
 // Routes
